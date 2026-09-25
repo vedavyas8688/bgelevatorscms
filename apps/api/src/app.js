@@ -14,10 +14,11 @@ export function createApp(store,overrides={}){
  const transport=process.env.SMTP_HOST?nodemailer.createTransport({host:process.env.SMTP_HOST,port:Number(process.env.SMTP_PORT||587),secure:process.env.SMTP_SECURE==='true',auth:process.env.SMTP_USER?{user:process.env.SMTP_USER,pass:process.env.SMTP_PASSWORD}:undefined,connectionTimeout:10000,socketTimeout:10000}):null;
  const service=createService(store,{origins:config.origins,production:config.production,
   async upload(item,bytes){
-   if(process.env.IMAGEKIT_PRIVATE_KEY&&!item.private){
+   if(process.env.IMAGEKIT_PRIVATE_KEY){
     const form=new FormData();form.set('file',new Blob([bytes],{type:item.type}),item.name);form.set('fileName',item.id+'-'+item.name);form.set('folder','/bg-elevators');
     const r=await fetch('https://upload.imagekit.io/api/v1/files/upload',{method:'POST',headers:{Authorization:'Basic '+Buffer.from(process.env.IMAGEKIT_PRIVATE_KEY+':').toString('base64')},body:form,signal:AbortSignal.timeout(30000)});if(!r.ok)throw new Error('ImageKit upload failed');const d=await r.json();return {url:d.url,storage:'imagekit',fileId:d.fileId};
    }
+   if(process.env.VERCEL)throw Object.assign(new Error('IMAGEKIT_PRIVATE_KEY is required for persistent uploads on Vercel.'),{status:503});
    await fs.mkdir(uploadRoot,{recursive:true});await fs.writeFile(path.join(uploadRoot,item.id),bytes,{flag:'wx',mode:0o600});return {storage:'local'};
   },
   async download(item){if(item.storage==='imagekit')return {body:new Uint8Array(await (await fetch(item.url)).arrayBuffer())};return {body:await fs.readFile(path.join(uploadRoot,item.id))};},
