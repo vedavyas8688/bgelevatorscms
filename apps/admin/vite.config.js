@@ -1,4 +1,4 @@
-import {defineConfig} from 'vite';import react from '@vitejs/plugin-react';import dotenv from 'dotenv';import {fileURLToPath} from 'node:url';import path from 'node:path';
-const root=fileURLToPath(new URL('../../',import.meta.url));dotenv.config({path:path.join(root,'.env'),quiet:true});
+import {defineConfig} from 'vite';import react from '@vitejs/plugin-react';import {loadEnvFile} from 'node:process';import {fileURLToPath} from 'node:url';import path from 'node:path';
+const root=fileURLToPath(new URL('../../',import.meta.url));if(!process.env.VERCEL)try{loadEnvFile(path.join(root,'.env'));}catch(error){if(error?.code!=='ENOENT')throw error;}
 const adminSlashRedirect={name:'admin-slash-redirect',configureServer(server){server.middlewares.use((req,res,next)=>{if(req.url==='/admin'){res.statusCode=302;res.setHeader('Location','/admin/');res.end();return;}next();});}};
 export default defineConfig({base:'/admin/',plugins:[adminSlashRedirect,react()],server:{proxy:{'/api':process.env.API_URL||'http://127.0.0.1:4000','/images':process.env.API_URL||'http://127.0.0.1:4000','/fonts':process.env.API_URL||'http://127.0.0.1:4000','/css':process.env.API_URL||'http://127.0.0.1:4000','/js':process.env.API_URL||'http://127.0.0.1:4000','/vendor':process.env.API_URL||'http://127.0.0.1:4000'}},build:{outDir:'dist'}});
