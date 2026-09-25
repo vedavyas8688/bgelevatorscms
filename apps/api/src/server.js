@@ -2,11 +2,11 @@ import {mongoStore} from '@bg/database';
 import {config} from './config.js';
 import {createApp} from './app.js';
 import express from 'express';
-if(!config.mongo)throw new Error('Set MONGODB_URI in the root .env file. See README.md.');
 
 let store;
 let appPromise;
 function getApp(){
+ if(!config.mongo)return Promise.reject(new Error('Set MONGODB_URI in the Vercel project environment variables.'));
  if(!appPromise)appPromise=mongoStore(config.mongo).then(nextStore=>{store=nextStore;return createApp(nextStore).app;}).catch(error=>{appPromise=undefined;throw error;});
  return appPromise;
 }
