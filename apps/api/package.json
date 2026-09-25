@@ -13,6 +13,7 @@
   "dependencies": {
     "@bg/database": "1.0.0",
     "@bg/cms": "1.0.0",
+    "dotenv": "^16.6.1",
     "express": "^4.21.2",
     "helmet": "^8.0.0",
     "nodemailer": "^7.0.6"
