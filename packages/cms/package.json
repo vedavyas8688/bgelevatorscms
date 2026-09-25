@@ -1,0 +1,10 @@
+{
+  "name": "@bg/cms",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": "./src/index.js",
+  "dependencies": {
+    "@bg/content": "1.0.0",
+    "sanitize-html": "^2.17.0"
+  }
+}

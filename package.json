@@ -1,0 +1,40 @@
+{
+  "name": "bg-elevators-cms",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 4173 --strictPort",
+    "dev:api": "npm run dev -w apps/api",
+    "dev:storefront": "npm run dev -w apps/storefront",
+    "dev:admin": "npm run dev -w apps/admin",
+    "build": "npm run build -w apps/storefront && npm run build -w apps/admin",
+    "build:sites": "node scripts/build-sites.mjs",
+    "seed": "node apps/api/src/scripts/seed.js",
+    "create-admin": "node apps/api/src/scripts/create-admin.js",
+    "test": "node tests/integration.mjs",
+    "test:integration": "node tests/integration.mjs",
+    "audit:content": "node scripts/audit-content.mjs",
+    "migrate:clean-urls": "node scripts/migrate-clean-urls.mjs",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "drizzle-orm": "^0.44.5"
+  },
+  "devDependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "drizzle-kit": "^0.31.4",
+    "esbuild": "^0.25.9",
+    "mongodb-memory-server": "^10.4.3",
+    "swiper": "^9.4.1",
+    "vite": "^6.0.5"
+  }
+}

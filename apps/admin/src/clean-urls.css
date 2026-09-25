@@ -1,0 +1,1 @@
+.new-post .slug-input>span:last-child{display:none}.new-post .slug-input+small{font-size:0}.new-post .slug-input+small::after{content:'New posts use a clean extensionless URL.';font-size:11px}

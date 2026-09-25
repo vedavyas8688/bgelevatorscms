@@ -1,0 +1,9 @@
+{
+  "name": "@bg/database",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": "./src/index.js",
+  "dependencies": {
+    "mongoose": "^8.19.1"
+  }
+}

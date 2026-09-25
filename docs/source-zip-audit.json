@@ -1,0 +1,37 @@
+{
+  "source": {
+    "root": "C:\\Users\\janu\\Desktop\\Hirola\\bgelevatorsnew\\bg-elevators-cms\\.audit-source\\bg_elevators-main",
+    "files": 570,
+    "htmlPages": 139,
+    "assets": 428
+  },
+  "migration": {
+    "pages": 139,
+    "blogs": 103,
+    "manifestEntries": 139
+  },
+  "htmlFiles": {
+    "missingFromManifest": [],
+    "missingFromZip": [],
+    "hashMismatches": []
+  },
+  "routes": {
+    "missingFromMigration": [],
+    "unexpectedInMigration": [],
+    "duplicateSource": [],
+    "duplicateMigration": []
+  },
+  "rendering": {
+    "unresolvedPlaceholders": [],
+    "emptyPages": [],
+    "errors": []
+  },
+  "assets": {
+    "sourceAssets": 428,
+    "missingFromPublic": [],
+    "changedFromSource": []
+  },
+  "exactHtmlSourceMatch": true,
+  "routeParity": true,
+  "generatedAt": "2026-09-25T08:35:41.435Z"
+}

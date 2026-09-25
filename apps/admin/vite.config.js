@@ -1,0 +1,3 @@
+import {defineConfig} from 'vite';import react from '@vitejs/plugin-react';import dotenv from 'dotenv';import {fileURLToPath} from 'node:url';import path from 'node:path';
+const root=fileURLToPath(new URL('../../',import.meta.url));dotenv.config({path:path.join(root,'.env'),quiet:true});
+export default defineConfig({base:'/admin/',plugins:[react()],server:{proxy:{'/api':process.env.API_URL||'http://127.0.0.1:4000','/images':process.env.API_URL||'http://127.0.0.1:4000','/fonts':process.env.API_URL||'http://127.0.0.1:4000','/css':process.env.API_URL||'http://127.0.0.1:4000','/js':process.env.API_URL||'http://127.0.0.1:4000','/vendor':process.env.API_URL||'http://127.0.0.1:4000'}},build:{outDir:'dist'}});

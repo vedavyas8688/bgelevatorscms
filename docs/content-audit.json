@@ -1,0 +1,48 @@
+{
+  "pages": 139,
+  "blogPosts": 103,
+  "sections": 399,
+  "editableFields": 10926,
+  "sharedRegions": 14,
+  "originalMedia": 421,
+  "duplicateRoutes": 0,
+  "unresolvedFields": 0,
+  "missingOriginalAssets": [
+    {
+      "asset": "/images/6742b078ec44f828a71fee11_job-details-cover.webp",
+      "pages": [
+        "/career-details"
+      ]
+    },
+    {
+      "asset": "/images/6742a3709ad20d03319b2c90_job-type.webp",
+      "pages": [
+        "/career-details"
+      ]
+    },
+    {
+      "asset": "/images/674295aa59a1771b56fbcbca_benefit-1.webp",
+      "pages": [
+        "/why-choose-us"
+      ]
+    },
+    {
+      "asset": "/images/674295a97eb2ae96a2c0ec1c_benefit-2.webp",
+      "pages": [
+        "/why-choose-us"
+      ]
+    },
+    {
+      "asset": "/images/674295a9281b8f522264dce0_benefit-3.webp",
+      "pages": [
+        "/why-choose-us"
+      ]
+    },
+    {
+      "asset": "/images/674295aa59a1771b56fbcbf6_benefit-4.webp",
+      "pages": [
+        "/why-choose-us"
+      ]
+    }
+  ]
+}

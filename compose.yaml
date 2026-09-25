@@ -1,0 +1,46 @@
+services:
+  mongo:
+    image: mongo:8.0
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:?Set MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?Set MONGO_ROOT_PASSWORD}
+    volumes: [mongo_data:/data/db]
+    healthcheck:
+      test: [CMD, mongosh, --quiet, --eval, "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+  seed:
+    build: {context: ., dockerfile: deploy/Dockerfile, target: runtime}
+    env_file: .env
+    environment:
+      MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:27017/bg_elevators?authSource=admin
+    command: [node, apps/api/src/scripts/seed.js]
+    depends_on: {mongo: {condition: service_healthy}}
+  api:
+    build: {context: ., dockerfile: deploy/Dockerfile, target: runtime}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      TRUST_PROXY: "1"
+      MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:27017/bg_elevators?authSource=admin
+      UPLOAD_DIR: /app/uploads
+    volumes: [uploads:/app/uploads]
+    depends_on: {seed: {condition: service_completed_successfully}}
+  storefront:
+    build: {context: ., dockerfile: deploy/Dockerfile, target: runtime}
+    restart: unless-stopped
+    env_file: .env
+    environment: {NODE_ENV: production, API_URL: 'http://api:4000'}
+    command: [npm, run, start, --workspace=apps/storefront]
+    depends_on: [api]
+  gateway:
+    build: {context: ., dockerfile: deploy/Dockerfile, target: gateway}
+    restart: unless-stopped
+    ports: ['8080:80']
+    depends_on: [storefront, api]
+volumes:
+  mongo_data:
+  uploads:

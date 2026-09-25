@@ -1,0 +1,10 @@
+node_modules/
+.next/
+dist/
+.env
+.env.*
+!.env.example
+/uploads/
+.sites-runtime/
+.wrangler/
+*.log

@@ -1,0 +1,1 @@
+export default function NotFound(){return <main style={{fontFamily:'Arial',maxWidth:600,margin:'12vh auto',padding:32}}><img src="/images/bgElevetorMain.png" width="180" alt="BG Elevators"/><h1>Page not found</h1><p>The page you requested is unavailable.</p><a href="/">Return to home</a></main>;}

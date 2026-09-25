@@ -1,0 +1,10 @@
+{
+  "name": "@bg/content",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./seed": "./seed.json",
+    "./templates": "./templates.json"
+  }
+}
