@@ -21,7 +21,7 @@ export async function passwordHash(password,salt=random()) {
 async function passwordMatches(password,stored){if(!stored)return false;const value=await passwordHash(password,stored.split(':')[0]);let d=value.length^stored.length;for(let i=0;i<value.length;i++)d|=value.charCodeAt(i)^stored.charCodeAt(i);return d===0;}
 export async function seedStore(store){for(const [kind,values] of Object.entries(seed)){for(const value of values){if(!await store.get(kind,value.id))await store.put(kind,value.id,clone(value),0);}}}
 export async function createAdmin(store,email,password,name='Administrator'){
- email=String(email).toLowerCase().trim();assert(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),'Valid email required.');assert(password?.length>=12,'Password must have at least 12 characters.');
+ email=String(email).toLowerCase().trim();assert(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),'Valid email required.');assert(password?.length>=10,'Password must have at least 10 characters.');
  const id=await hash(email);assert(!await store.get('users',id),'User already exists.');
  return store.put('users',id,{id,email,name,role:'admin',status:'active',passwordHash:await passwordHash(password),createdAt:now()},0);
 }
@@ -187,7 +187,7 @@ export function createService(store,options={}) {
   if(kind==='users'){
    assert(!platformAuth,'Team access for this preview is controlled by Sites. Use the VPS CMS to manage staff accounts.');
    if(method==='POST'&&!id){const result=await createAdmin(store,data.email,data.password,data.name);const saved=await store.put(kind,result.id,{...result,role:data.role==='editor'?'editor':'admin'},result.version);await auditSafe(user,'Created user',saved.email);return json(safeUser(saved),201);}
-   if(method==='PUT'&&id){const old=await store.get(kind,id);assert(old,'Not found.',404);assert(id!==user.id||data.status==='active','You cannot disable your own account.');assert(id!==user.id||data.role==='admin','You cannot demote your own account.');const next={...old,name:plain(data.name,150),role:data.role==='editor'?'editor':'admin',status:data.status==='active'?'active':'disabled'};if(data.password){assert(data.password.length>=12,'Use at least 12 characters.');next.passwordHash=await passwordHash(data.password);for(const s of await store.list('sessions'))if(s.userId===id)await store.remove('sessions',s.id);}
+   if(method==='PUT'&&id){const old=await store.get(kind,id);assert(old,'Not found.',404);assert(id!==user.id||data.status==='active','You cannot disable your own account.');assert(id!==user.id||data.role==='admin','You cannot demote your own account.');const next={...old,name:plain(data.name,150),role:data.role==='editor'?'editor':'admin',status:data.status==='active'?'active':'disabled'};if(data.password){assert(data.password.length>=10,'Use at least 10 characters.');next.passwordHash=await passwordHash(data.password);for(const s of await store.list('sessions'))if(s.userId===id)await store.remove('sessions',s.id);}
     const result=await store.put(kind,id,next,old.version);await auditSafe(user,'Updated user',old.email);return json(safeUser(result));}
   }
   if(kind==='redirects'){
