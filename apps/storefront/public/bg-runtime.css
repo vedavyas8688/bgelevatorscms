@@ -1,1 +1,13 @@
-.bg-form-status{font-size:14px;line-height:1.5;margin:12px 0;color:#006699}.bg-form-status:empty{display:none}button:disabled,input[type=submit]:disabled{opacity:.65;cursor:wait}img{max-width:100%}a:focus-visible,button:focus-visible,[role=button]:focus-visible{outline:2px solid #3396d6;outline-offset:4px}.w-webflow-badge{display:none!important}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}[data-w-id]{opacity:1!important;transform:none!important}}
+.bg-form-status{font-size:14px;line-height:1.5;margin:12px 0;color:#006699}.bg-form-status:empty{display:none}button:disabled,input[type=submit]:disabled{opacity:.65;cursor:wait}img{max-width:100%}a:focus-visible,button:focus-visible,[role=button]:focus-visible{outline:2px solid #3396d6;outline-offset:4px}.w-webflow-badge{display:none!important}
+.bg-motion .bg-reveal{opacity:0!important;transform:translate3d(0,26px,0)!important;transition:opacity .72s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)!important;will-change:opacity,transform}
+.bg-motion .bg-reveal.bg-reveal-visible{opacity:1!important;transform:translate3d(0,0,0)!important;will-change:auto}
+.bg-motion .bg-reveal.bg-reveal-visible [data-w-id]{opacity:1!important;transform:none!important}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.bg-motion .bg-reveal,[data-w-id]{opacity:1!important;transform:none!important}}
+@media(max-width:767px){
+ .slider.w-slider{width:100%;overflow:hidden}
+ .slider .w-slider-mask{width:100%;overflow:hidden}
+ .slider .slider-item.w-slide{width:100%!important;max-width:none!important;margin-right:0!important;padding:0 .15rem}
+ .slider .testimonial-card{min-height:0;height:100%;text-align:left}
+ .slider .slider-nav{margin-top:1.5rem}
+ .slider .w-slider-dot{width:.5rem;height:.5rem;margin-left:.2rem;margin-right:.2rem}
+}

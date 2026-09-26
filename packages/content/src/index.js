@@ -27,10 +27,23 @@ export function fillTemplate(templateId, content, context={}) {
    const extras=all.filter(p=>p.kind==='blog'&&p.published&&p.status!=='archived'&&!seed.pages.some(s=>s.id===p.id));
    if(extras.length)records=[...extras.sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||'')),...records];
    if(context.page?.id==='home')records=records.slice(0,paths.length);
-   return records.map(p=>{
+   return records.map((p,index)=>{
    const l=p.published.listing||{};
+   const blog=p.published.blog||{},author=blog.author||{};
    const data={PATH:cleanPath(p.path),IMAGE:l.image||'',TITLE:l.title||p.name,DATE:l.date||'',EXCERPT:l.excerpt||''};
-    return `<div class="w-dyn-item" role="listitem"><a class="blog-card w-inline-block" href="${escapeHtml(data.PATH)}"><div class="blog-card-image"><img src="${escapeHtml(data.IMAGE)}" alt="${escapeHtml(data.TITLE)}" loading="lazy" decoding="async"></div><div class="blog-card-center"><div class="blog-card-title-wrap"><div class="text-md secondary-700">${escapeHtml(data.DATE)}</div><h2 class="h5">${escapeHtml(data.TITLE)}</h2></div><svg class="blog-card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/></svg></div><p>${escapeHtml(data.EXCERPT)}</p></a></div>`;
+    const categories=(blog.categories||[]).slice(0,2);
+    const chips=(categories.length?categories:['Elevator insights']).map(category=>`<span>${escapeHtml(category)}</span>`).join('');
+    const authorName=author.name||'BG Elevators Editorial';
+    const authorMedia=author.avatar?`<img src="${escapeHtml(author.avatar)}" alt="" loading="lazy" decoding="async">`:'<span aria-hidden="true">BG</span>';
+    const blogIndex=context.page?.id==='blogs';
+    // Start the cards visible above and just below the fold immediately. Keeping the
+    // remaining cards lazy avoids requesting the entire (large) article library.
+    const priority=blogIndex&&index===0
+     ? 'loading="eager" fetchpriority="high"'
+     : blogIndex&&index<6
+      ? 'loading="eager" fetchpriority="auto"'
+      : 'loading="lazy" fetchpriority="low"';
+    return `<div class="w-dyn-item" role="listitem"><a class="blog-card w-inline-block" href="${escapeHtml(data.PATH)}"><div class="blog-card-image"><img src="${escapeHtml(data.IMAGE)}" alt="${escapeHtml(data.TITLE)}" ${priority} decoding="async"></div><div class="blog-card-center"><div class="blog-card-title-wrap"><div class="premium-card-kicker"><span class="premium-card-chips">${chips}</span><time>${escapeHtml(data.DATE)}</time></div><h2 class="h5">${escapeHtml(data.TITLE)}</h2></div><svg class="blog-card-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/></svg></div><p>${escapeHtml(data.EXCERPT)}</p><div class="premium-card-footer"><div class="premium-card-author">${authorMedia}<strong>${escapeHtml(authorName)}</strong></div><span class="premium-card-read">Read article <b aria-hidden="true">↗</b></span></div></a></div>`;
    }).join('');
   }
   return escapeHtml(value);
@@ -49,23 +62,25 @@ export function renderPage(page, regions=[], pages=[], draft=false) {
  const premiumBlog=page.id==='blogs'||page.kind==='blog';
  if(page.id==='blogs'){
   const count=pages.filter(item=>item.kind==='blog'&&item.published&&item.status!=='archived').length;
-  html=html.replace('<main>','<main class="premium-blog-index">').replace('<div class="w-dyn-list">',`<div class="premium-blog-tools"><div><strong>${count}</strong><span>expert articles</span></div><label><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/></svg><input type="search" data-blog-search placeholder="Search elevator insights…" aria-label="Search articles"></label></div><div class="w-dyn-list">`);
-  html=html.replace('</div>\n</div>\n</section>',`</div><div class="premium-blog-empty" hidden>No articles match your search.</div><button class="premium-load-more" type="button" data-blog-more>Explore more articles <span>↓</span></button></div></section>`);
+  html=html.replace('<main>','<main class="premium-blog-index">').replace('<div class="w-dyn-list">',`<div class="premium-blog-intro"><p>Practical guidance, industry perspectives and expert thinking for safer, smarter vertical mobility.</p><span>Knowledge built on 30+ years of elevator experience.</span></div><div class="premium-blog-tools"><div><strong>${count}</strong><span>expert articles</span></div><label><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/></svg><input type="search" data-blog-search placeholder="Search the journal…" aria-label="Search articles"></label></div><div class="w-dyn-list">`);
+  html=html.replace('</div>\n</div>\n</section>',`</div><div class="premium-blog-empty" hidden>No articles match your search.</div><button class="premium-load-more" type="button" data-blog-more>Load <span data-more-count>6</span> more articles <b aria-hidden="true">↓</b></button></div></section>`);
  }
  if(page.kind==='blog'){
   html=html.replace('<main>','<main class="premium-blog-detail"><div class="premium-reading-progress" aria-hidden="true"><span></span></div>');
+  html=html.replace('<div class="two-row-title-wrap"',`<a class="premium-article-back" href="/blogs"><span aria-hidden="true">←</span> Back to journal</a><div class="two-row-title-wrap"`);
   const article=sections.find(section=>(templates[section.template]?.fields||[]).some(field=>field.type==='richtext'));
   const bodyField=(templates[article?.template]?.fields||[]).find(field=>field.type==='richtext');
   const words=String(article?.fields?.[bodyField?.id]||'').replace(/<[^>]+>/g,' ').trim().split(/\s+/).filter(Boolean).length;
-  const meta=`<div class="premium-article-meta"><span>BG Elevators Editorial</span><i></i><time>${escapeHtml(source.listing?.date||'')}</time><i></i><span>${Math.max(1,Math.ceil(words/220))} min read</span></div>`;
+  const authorName=source.blog?.author?.name||'BG Elevators Editorial';
+  const meta=`<div class="premium-article-meta"><span>Elevator journal</span><i></i><time>${escapeHtml(source.listing?.date||'')}</time><i></i><span>${Math.max(1,Math.ceil(words/220))} min read</span></div><p class="premium-article-deck">${escapeHtml(source.listing?.excerpt||'Practical elevator knowledge shaped by decades of engineering and service experience.')}</p><p class="premium-article-byline">By ${escapeHtml(authorName)}</p>`;
   html=html.replace('</div><img alt=',`</div>${meta}<img alt=`);
   html=html.replace('<div class="blog-content',`<div class="premium-article-tools"><span>Elevator knowledge, clearly explained</span><button type="button" data-copy-link>Copy article link</button></div><div class="blog-content`);
   html=html.replace(/class="blog-cover-image"([^>]*?)loading="lazy"/, 'class="blog-cover-image"$1loading="eager" fetchpriority="high"');
-  const related=pages.filter(item=>item.id!==page.id&&item.kind==='blog'&&item.published&&item.status!=='archived').slice(0,3).map(item=>{const listing=item.published.listing||{};return `<article class="premium-related-card"><a href="${escapeHtml(item.path)}"><img src="${escapeHtml(listing.image||'')}" alt="" loading="lazy"><div><time>${escapeHtml(listing.date||'')}</time><h3>${escapeHtml(listing.title||item.name)}</h3><span>Read article →</span></div></a></article>`}).join('');
-  if(related){const block=`<section class="premium-related"><div class="container"><div class="premium-related-heading"><span>Continue exploring</span><h2>More elevator insights</h2></div><div class="premium-related-grid">${related}</div></div></section>`;const firstClose=html.indexOf('</section>',html.indexOf('<main'));if(firstClose>=0)html=html.slice(0,firstClose+10)+block+html.slice(firstClose+10);}
+  const related=pages.filter(item=>item.id!==page.id&&item.kind==='blog'&&item.published&&item.status!=='archived').slice(0,3).map(item=>{const listing=item.published.listing||{};return `<article class="premium-related-card"><a href="${escapeHtml(item.path)}"><img class="premium-related-image" src="${escapeHtml(listing.image||'')}" alt="" loading="lazy"><div><time>${escapeHtml(listing.date||'')}</time><h3>${escapeHtml(listing.title||item.name)}</h3><span>Read article →</span></div></a></article>`}).join('');
+  if(related){const block=`<section class="premium-related"><div class="container"><div class="premium-related-heading"><span>From the journal</span><h2>Keep reading</h2></div><div class="premium-related-grid">${related}</div></div></section>`;const firstClose=html.indexOf('</section>',html.indexOf('<main'));if(firstClose>=0)html=html.slice(0,firstClose+10)+block+html.slice(firstClose+10);}
  }
  html=html.replace(/<img\b(?![^>]*\bdecoding=)/gi,'<img decoding="async"');
- return {html:cleanInternalUrls(html),styles:layout.styles||[],stylesheets:[...new Set([...(layout.stylesheets||[]).map(localCss),...(premiumBlog?['/css/blog-premium.css']:[])])],htmlAttrs:layout.htmlAttrs,bodyClass:layout.bodyClass,scripts:layout.scripts,seo:cleanInternalUrls(source.seo),listing:source.listing};
+ return {html:cleanInternalUrls(html),styles:layout.styles||[],stylesheets:[...new Set([...(layout.stylesheets||[]).map(localCss),...(premiumBlog?['/css/blog-premium.css?v=4']:[])])],htmlAttrs:layout.htmlAttrs,bodyClass:layout.bodyClass,scripts:layout.scripts,seo:cleanInternalUrls(source.seo),listing:source.listing};
 }
 export function documentHtml(view,settings={},path='/') {
  const seo=view.seo||{};const origin=(settings.siteUrl||'https://bgelevators.com').replace(/\/$/,'');const canonical=cleanInternalUrls(seo.canonical)||origin+cleanPath(path);

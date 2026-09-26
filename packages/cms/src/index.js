@@ -54,7 +54,9 @@ export function createService(store,options={}) {
  let publicCache=null,publicCacheAt=0;
  const invalidatePublic=()=>{publicCache=null;publicCacheAt=0;};
  const publicData=async()=>{
-  if(publicCache&&Date.now()-publicCacheAt<60000)return publicCache;
+  // Published changes call invalidatePublic(), so a longer read cache stays fresh while
+  // preventing Atlas wake-ups from delaying visitors every minute.
+  if(publicCache&&Date.now()-publicCacheAt<300000)return publicCache;
   publicCache=await Promise.all([store.list('pages'),store.list('regions'),store.get('settings','site')]).then(([pages,regions,settings])=>({pages,regions,settings:settings||{}}));publicCacheAt=Date.now();return publicCache;
  };
  const audit=async(user,action,entity)=>{const id=crypto.randomUUID();await store.put('audit',id,{id,actor:user.email,action,entity,createdAt:now()},0);};
